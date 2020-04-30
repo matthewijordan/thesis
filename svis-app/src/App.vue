@@ -72,7 +72,7 @@
 			fetchDataByDay: async function (day) {
 				//console.log(this.appData)
 				if(!(day in this.appData)) {
-					return fetch("http://127.0.0.1:8800/data/" + day)
+					return fetch("http://"+window.location.hostname+":8800/data/" + day)
 					.then( response => {
 						return response.json()
 					}).then( jdata => {
