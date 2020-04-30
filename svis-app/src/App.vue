@@ -13,13 +13,25 @@
 				<h3>Data Controls</h3>
 				<hr/>
 				<div class="form-group">
-					<label for="customRange1">Time of day:</label>
-					<span class="float-right">{{filters.timeText}}</span>
+					<label >Model Type:</label>
+					<select class="form-control">
+						<option selected>Past data</option>
+						<option>Predictive</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Time of day:</label>
+					<span class="float-right">{{this.filters.timeText}}</span>
 					<input type="range" class="custom-range" min="0" max="96" v-model="filters.time" @change="filter()">
 				</div>
 				<div class="form-group">
 					<label >Date:</label>
 					<input type="date" class="form-control" v-model="filters.date" @change="filter()"/>
+				</div>
+				<div class="form-group">
+					<label >Weather:</label>
+					<select class="form-control">
+					</select>
 				</div>
 			</div>
 		</div></div>
@@ -35,6 +47,8 @@
 
 	import duocodes from './data/duocodes.json'
 	import Visual from './components/Visual.vue'
+	var moment = require('moment');
+	
 
 	export default {
 		name: 'App',
@@ -48,7 +62,7 @@
 				filters : {
 					date: '2020-03-07',
 					time: '56',
-					timeText: 'aaa'
+					timeText: '...'
 				},
 				filteredData : []
 			}
@@ -73,26 +87,25 @@
 			// apply filters
 			filter: function () {
 				this.fetchDataByDay(this.filters.date).then( () => {
-
-					var hours = Math.floor(this.filters.time / 4)
-					var minutes = (this.filters.time % 4) * 15
-					if (minutes==0) minutes='00'
-					if (hours<10) hours="0"+hours.toString()
-
-					var procTime = hours + ":" + minutes + ":00"
-					this.filters.timeText=procTime
-
-					console.log(procTime)
+					// new moment from date
+					var datetime = moment(this.filters.date).utcOffset('+1000')//.tz('Australia/NSW')
+					console.log(datetime.format())
+					// add minutes to datetime
+					datetime = datetime.add(this.filters.time * 15, 'minutes')
+					// minutes to display
+					this.filters.timeText = datetime.format('h:mm a');
 
 					var pcd = this.appData[this.filters.date]["postcode"]
 					for (var i in pcd) {
-						if ( (this.filters.date + 'T' + procTime + 'Z') == pcd[i]["ts"]) {
+						// find the actual timestamped collection
+						if ( (datetime.utc().format()) == pcd[i]["ts"]) {
 							this.filteredData = pcd[i]
 							break;
 						}
 					}
 				})
 			}
+
 		},
 		beforeMount: function () {
 			this.filter()
