@@ -22,7 +22,7 @@
 				<div class="form-group">
 					<label>Time of day:</label>
 					<span class="float-right">{{this.filters.timeText}}</span>
-					<input type="range" class="custom-range" min="0" max="96" v-model="filters.time" @change="filter()">
+					<input type="range" class="custom-range" min="0" max="96" v-model="filters.time" @input="filter()">
 				</div>
 				<div class="form-group">
 					<label >Date:</label>
@@ -58,6 +58,7 @@
 		data: function () {
 			return {
 				appData : {},
+				weatherData: {},
 				duocodes: duocodes,
 				filters : {
 					date: '2020-03-07',
@@ -84,6 +85,18 @@
 				return null
 			},
 
+			fetchWeatherData: async function () {
+				fetch("http://"+window.location.hostname+":8800/weather_data/")
+				.then( response => {
+					return response.json()
+				}).then( jdata => {
+					//console.log(jdata)
+					this.weather_data = jdata
+					return jdata
+				});
+				return null
+			},
+
 			// apply filters
 			filter: function () {
 				this.fetchDataByDay(this.filters.date).then( () => {
@@ -107,7 +120,8 @@
 			}
 
 		},
-		beforeMount: function () {
+		beforeMount: async function () {
+			await this.fetchWeatherData()
 			this.filter()
 		}
 	}
