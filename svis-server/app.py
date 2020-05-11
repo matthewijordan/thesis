@@ -67,6 +67,7 @@ def pre_load_weather_data(force=False):
     except IOError:
         print("[SVIS-SERVER] No existing weather cache file")
 
+    # if the stored data is out of date, or it's from todays date (meaning there could be new data), reach out for more data
     if (datetime.today().strftime('%Y-%m-%d') != weather_cache_old["updated_dt"] or force==True):
         print("[SVIS-SERVER] Cache out of date or force update, getting fresh data")
         temp_weather_cache = { "updated_dt": datetime.today().strftime('%Y-%m-%d') }

@@ -8,33 +8,35 @@
 			</div>
 		</nav>
 
-		<div id="filterboxPos"><div id="filterboxCont">
-			<div class="card text-white bg-dark p-3">
-				<h3>Data Controls</h3>
-				<hr/>
-				<div class="form-group">
-					<label >Model Type:</label>
-					<select class="form-control">
-						<option selected>Past data</option>
-						<option>Predictive</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label>Time of day:</label>
-					<span class="float-right">{{this.filters.timeText}}</span>
-					<input type="range" class="custom-range" min="0" max="96" v-model="filters.time" @input="filter()">
-				</div>
-				<div class="form-group">
-					<label >Date:</label>
-					<input type="date" class="form-control" v-model="filters.date" @change="filter()"/>
-				</div>
-				<div class="form-group">
-					<label >Weather:</label>
-					<select class="form-control">
-					</select>
-				</div>
+		<div class="overlayUi"><div id="filterboxCont"><div class="card text-white bg-dark p-3">
+			<h3>Data Controls</h3>
+			<hr/>
+			<div class="form-group">
+				<label >Model Type:</label>
+				<select class="form-control">
+					<option selected>Past data</option>
+					<option>Predictive</option>
+				</select>
 			</div>
-		</div></div>
+			<div class="form-group">
+				<label>Time of day:</label>
+				<span class="float-right">{{this.filters.timeText}}</span>
+				<input type="range" class="custom-range" min="0" max="96" v-model="filters.time" @input="filter()">
+			</div>
+			<div class="form-group">
+				<label>Date:</label>
+				<input type="date" class="form-control" v-model="filters.date" @change="filter()"/>
+			</div>
+			<div class="form-group">
+				<label>Weather:</label>
+				<select class="form-control">
+				</select>
+			</div>
+		</div></div></div>
+
+		<div v-if="filters.selectedDuocode!=''" id="overlayUi"><div id="infoboxCont"><div class="card text-white bg-dark p-3">
+			<h3>Data Point Info</h3>
+		</div></div></div>
 
 		<div class="fillHeight">
 			<Visual :filteredData="filteredData" />
@@ -63,7 +65,9 @@
 				filters : {
 					date: '2020-03-07',
 					time: '56',
-					timeText: '...'
+					timeText: '...',
+					selectedDuocode: '',
+					hoveredDuocode: ''
 				},
 				filteredData : []
 			}
@@ -86,7 +90,7 @@
 			},
 
 			fetchWeatherData: async function () {
-				fetch("http://"+window.location.hostname+":8800/weather_data/")
+				fetch("http://"+window.location.hostname+":8800/weather_data")
 				.then( response => {
 					return response.json()
 				}).then( jdata => {
@@ -102,9 +106,9 @@
 				this.fetchDataByDay(this.filters.date).then( () => {
 					// new moment from date
 					var datetime = moment(this.filters.date).utcOffset('+1000')//.tz('Australia/NSW')
-					console.log(datetime.format())
+					console.log(datetime.format());
 					// add minutes to datetime
-					datetime = datetime.add(this.filters.time * 15, 'minutes')
+					datetime = datetime.add(this.filters.time * 15, 'minutes');
 					// minutes to display
 					this.filters.timeText = datetime.format('h:mm a');
 
@@ -112,11 +116,20 @@
 					for (var i in pcd) {
 						// find the actual timestamped collection
 						if ( (datetime.utc().format()) == pcd[i]["ts"]) {
-							this.filteredData = pcd[i]
+							this.filteredData = pcd[i];
 							break;
 						}
 					}
 				})
+			},
+
+			// call this from data points
+			setSelectedDuocode: async function (duocode) {
+				this.filters.selectedDuocode = duocode;
+			},
+
+			setHoverDuocode: async function (duocode) {
+				this.filters.hoveredDuocode = duocode;
 			}
 
 		},
@@ -142,8 +155,12 @@
 	height: calc(100vh - 4em);
 }
 
-#filterboxPos{
+.overlayUi{
 	position: relative; width: 0; height: 0;
+}
+
+#infoboxCont{
+	position: absolute; left: 20px; bottom: 20px; width:25em;
 }
 
 #filterboxCont{
