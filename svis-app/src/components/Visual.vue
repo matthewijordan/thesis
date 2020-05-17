@@ -44,6 +44,7 @@
                     thisdp.y = dc["lat"]
                     thisdp.duocode = k
                     thisdp.value = 0
+                    thisdp.shapedata = dc["shapedata"]
                     if (k in this.filteredData) {
                         thisdp.value = this.filteredData[k]
                     }

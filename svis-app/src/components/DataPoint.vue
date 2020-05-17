@@ -1,8 +1,12 @@
 <template>
 	<!-- <box :position="[dataPoint.x,dataPoint.value,dataPoint.y]" v-model="dataPointBab"></box> -->
-    <box v-model="dataPointBab">
+    <entity v-model="dataPointBab">
+    <box :position="[dataPoint.x,dataPoint.value,dataPoint.y]">
         <Material v-if="isPicked" diffuse="#F00"></Material>
     </box>
+    <ExtrudePolygon :options="expop" :shape="[0,0,0]"></ExtrudePolygon>
+    </entity>
+    
 </template>
 
 <script>
@@ -16,7 +20,15 @@
 
         data: function(){
             return {
-                dataPointBab: null      
+                dataPointBab: null ,
+                expop: {
+                    shape: [
+                        [0,0,0],[0,0,1],[1,0,0],[0,0,0]
+                    ],
+                    path: [
+                        [0,1,0]
+                    ]
+                }
             }
         },
 
