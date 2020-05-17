@@ -1,6 +1,6 @@
 <template>
 	<div id="vis-container">
-        <Scene>
+        <Scene @scene="onScene" :environment="{createSkybox:false}">
                 <!-- <box v-for="dp in dataPoints()" :position="[dp.x,dp.value,dp.y]" :key="`${dp.x},${dp.value},${dp.y}`"></box> -->
                 <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.x},${dp.value},${dp.y}`"/>
         </Scene>
@@ -16,14 +16,14 @@
         name: 'Visual',
 
         props: [
-            'filteredData'
+            'filteredData',
         ],
 
         data: function(){
             return {
                 duocodes: duocodes,
                 // babylon objects { 'duocode' : obj }
-                dataPoints3d: null
+                scene: null
             }
         },
 
@@ -49,8 +49,33 @@
                     dp.push(thisdp)
                 }
                 return dp
+            },
+
+            selectDataPoint: function() {
+                //var result = this.scene.pick(this.scene.pointerX, this.scene.pointerY)
+                //console.log(result)
+                console.log('test')
+            },
+
+            onScene: function(scene) {
+                // store for later...
+                this.scene = scene
+                var self = this
+                scene.onPointerDown = function (evt, res) {
+                    console.log(res)
+                    if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
+                        console.log(self)
+                        self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
+                    }
+                }
+
+            },
+
+            getEnvironment: function() {
+                return 0
             }
-        }
+
+        },
     }
 
 </script>

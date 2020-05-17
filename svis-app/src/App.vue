@@ -6,6 +6,9 @@
 				<a class="navbar-brand">SVIS</a>
 				<span class="navbar-text">3D visualisation for australian PV data </span>
 			</div>
+			<div>
+				<button type="button" class="btn btn-light" @click="infoPaneVisible=true">Help</button>
+			</div>
 		</nav>
 
 		<div class="overlayUi"><div id="filterboxCont"><div class="card text-white bg-dark p-3">
@@ -36,10 +39,38 @@
 
 		<div v-if="filters.selectedDuocode!=''" id="overlayUi"><div id="infoboxCont"><div class="card text-white bg-dark p-3">
 			<h3>Data Point Info</h3>
+			<hr/>
+			<strong>Selected data point: </strong> {{filters.selectedDuocode}}
 		</div></div></div>
 
 		<div class="fillHeight">
-			<Visual :filteredData="filteredData" />
+			<Visual :filteredData="filteredData" @setSelectedDuocode="setSelectedDuocode" />
+		</div>
+
+		<div id="InfoPane" class="overlayUi" v-if="infoPaneVisible">
+			<div id="infoPaneBackground" @click="infoPaneVisible=false">
+			</div>
+			<div id="infoPaneCont">
+				<div class="card mx-auto mt-5" style="width: 50rem;">
+					<div class="card-body">
+						<h5 class="card-title">About SVIS-APP</h5>
+						<hr/>
+						<h6 class="card-subtitle mb-2 text-muted">About</h6>
+						<p class="card-text">
+							SVIS-APP is a 3d visualisation tool for solar data.
+						</p>
+						<hr/>
+						<h6 class="card-subtitle mb-2 text-muted">How to use</h6>
+						<p class="card-text">
+							Hold left mouse - orbit <br/>
+							Hold right mouse - pan <br/>
+							Scroll wheel - zoom <br/>
+						</p>
+						<hr/>
+						<a href="#" class="card-link" @click="infoPaneVisible=false">Close</a>
+					</div>
+				</div>
+			</div>
 		</div>
 
 	</div>
@@ -69,7 +100,8 @@
 					selectedDuocode: '',
 					hoveredDuocode: ''
 				},
-				filteredData : []
+				filteredData : [],
+				infoPaneVisible: false
 			}
 		},
 		methods: {
@@ -165,6 +197,15 @@
 
 #filterboxCont{
 	position: absolute; left: 20px; top: 20px; width:25em;
+}
+
+#infoPaneBackground{
+	position: absolute; left: 0px; bottom: 0px; width: 100vw; height: 100vh;
+	background-color: rgba(52,58,64,.5);
+}
+
+#infoPaneCont{
+	position: absolute; left: 0px; bottom: 0px; width: 100vw; height: 100vh;
 }
 
 </style> 
