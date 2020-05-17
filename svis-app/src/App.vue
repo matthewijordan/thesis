@@ -43,8 +43,9 @@
 			<strong>Selected data point: </strong> {{filters.selectedDuocode}}
 		</div></div></div>
 
+		<!-- RENDER VISUAL HERE -->
 		<div class="fillHeight">
-			<Visual :filteredData="filteredData" @setSelectedDuocode="setSelectedDuocode" />
+			<Visual :filteredData="filteredData" @setSelectedDuocode="setSelectedDuocode" :filters="filters" />
 		</div>
 
 		<div id="InfoPane" class="overlayUi" v-if="infoPaneVisible">

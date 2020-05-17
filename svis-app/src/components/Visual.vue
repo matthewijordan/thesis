@@ -2,7 +2,7 @@
 	<div id="vis-container">
         <Scene @scene="onScene" :environment="{createSkybox:false}">
                 <!-- <box v-for="dp in dataPoints()" :position="[dp.x,dp.value,dp.y]" :key="`${dp.x},${dp.value},${dp.y}`"></box> -->
-                <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.x},${dp.value},${dp.y}`"/>
+                <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.x},${dp.value},${dp.y}`" :isPicked="dp.duocode==filters.selectedDuocode"/>
         </Scene>
 	</div>
 </template>
@@ -17,6 +17,7 @@
 
         props: [
             'filteredData',
+            'filters'
         ],
 
         data: function(){
