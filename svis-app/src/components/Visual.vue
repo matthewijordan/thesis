@@ -1,6 +1,6 @@
 <template>
 	<div id="vis-container">
-        <Scene @scene="onScene" :environment="{createSkybox:false}">
+        <Scene @scene="onScene" :environment="{createSkybox:false, createGround:false}">
                 <!-- <box v-for="dp in dataPoints()" :position="[dp.x,dp.value,dp.y]" :key="`${dp.x},${dp.value},${dp.y}`"></box> -->
                 <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.x},${dp.value},${dp.y}`" :isPicked="dp.duocode==filters.selectedDuocode"/>
         </Scene>

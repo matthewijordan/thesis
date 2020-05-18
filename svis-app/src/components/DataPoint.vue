@@ -4,6 +4,17 @@
         <box :position="[dataPoint.x,dataPoint.value*0.5,dataPoint.y]" :name="'boxPoint'">
             <Material v-if="isPicked" diffuse="#F00"></Material>
         </box>
+
+        <PolygonMesh
+            :options="{
+                shape: [
+                    [100,0,0],
+                    [0,0,0],
+                    [0,0,100]
+                ],
+                sideOrientation: 2
+            }"
+        />
         
     </entity>
     
@@ -36,6 +47,13 @@
                         console.log(m)
                     }
                 } )
+            },
+
+            // shapedata to vector 3
+            transformShapedata: function() {
+                return [
+
+                ]
             }
         },
 
