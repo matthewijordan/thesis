@@ -1,10 +1,10 @@
 <template>
 	<!-- <box :position="[dataPoint.x,dataPoint.value,dataPoint.y]" v-model="dataPointBab"></box> -->
-    <entity v-model="dataPointBab">
-    <box :position="[dataPoint.x,dataPoint.value,dataPoint.y]">
-        <Material v-if="isPicked" diffuse="#F00"></Material>
-    </box>
-    <ExtrudePolygon :options="expop" :shape="[0,0,0]"></ExtrudePolygon>
+    <entity v-model="dataPointBab" @complete="onComplete">
+        <box :position="[dataPoint.x,dataPoint.value*0.5,dataPoint.y]" :name="'boxPoint'">
+            <Material v-if="isPicked" diffuse="#F00"></Material>
+        </box>
+        
     </entity>
     
 </template>
@@ -20,27 +20,40 @@
 
         data: function(){
             return {
-                dataPointBab: null ,
-                expop: {
-                    shape: [
-                        [0,0,0],[0,0,1],[1,0,0],[0,0,0]
-                    ],
-                    path: [
-                        [0,1,0]
-                    ]
-                }
+                dataPointBab: null 
+            }
+        },
+
+        methods: {
+
+            // Once all sub entities/meshes are ready
+            onComplete: function() {
+                // go through any attached children
+                let dp = this.dataPoint
+                this.dataPointBab.getChildren().forEach( (m) => {
+                    m.appdata = { id: dp.duocode }
+                    if(m.name=='boxPoint'){
+                        console.log(m)
+                    }
+                } )
             }
         },
 
         watch: {
+            //I guess this is useless now
            dataPointBab: function () {
-               let dp = this.dataPoint
-               this.dataPointBab.position.x = dp.x;
-               this.dataPointBab.position.y = dp.value*0.5;
-               this.dataPointBab.position.z = dp.y;
+               //let dp = this.dataPoint
+               //this.dataPointBab.position.x = dp.x;
+               //this.dataPointBab.position.y = dp.value*0.5;
+               //this.dataPointBab.position.z = dp.y;
 
                // register the ID/duocode so we can identify the mesh
-               this.dataPointBab.appdata = { id: dp.duocode }
+               //this.dataPointBab.
+               //console.log(this.dataPointBab.getChildren())
+               //for (var i in this.dataPointBab.getChildren()) {
+               //    console.log(i)
+               //}
+               //this.dataPointBab.appdata = { id: dp.duocode }
            }
         }
 

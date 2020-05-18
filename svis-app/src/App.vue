@@ -58,7 +58,8 @@
 						<hr/>
 						<h6 class="card-subtitle mb-2 text-muted">About</h6>
 						<p class="card-text">
-							SVIS-APP is a 3d visualisation tool for solar data.
+							SVIS-APP is a 3d visualisation tool for solar data <br/>
+							
 						</p>
 						<hr/>
 						<h6 class="card-subtitle mb-2 text-muted">How to use</h6>
@@ -68,6 +69,12 @@
 							Scroll wheel - zoom <br/>
 						</p>
 						<hr/>
+						<p class="card-text">
+							Published under the GNU General Public License V3, source code available at 
+							<a href="https://github.com/matthewijordan/thesis">GitHub.com</a>
+						</p>
+						<hr/>
+						
 						<a href="#" class="card-link" @click="infoPaneVisible=false">Close</a>
 					</div>
 				</div>
@@ -202,7 +209,7 @@
 
 #infoPaneBackground{
 	position: absolute; left: 0px; bottom: 0px; width: 100vw; height: 100vh;
-	background-color: rgba(52,58,64,.5);
+	background-color: rgba(20,20,40,.8);
 }
 
 #infoPaneCont{
