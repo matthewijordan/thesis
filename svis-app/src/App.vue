@@ -1,24 +1,26 @@
 <template>
 	<div id="app" class="mh-100">
 
-		<nav class="navbar navbar-dark bg-dark" id="appNav">
+		<nav class="navbar navbar-light " id="appNav">
 			<div>
 				<a class="navbar-brand">SVIS</a>
 				<span class="navbar-text">3D visualisation for australian PV data </span>
 			</div>
 			<div>
-				<button type="button" class="btn btn-light" @click="infoPaneVisible=true">Help</button>
+				<a @click="infoPaneVisible=true" href="">
+					<i class="fa fa-info-circle fa-2x" aria-hidden="true"></i>
+				</a>
 			</div>
 		</nav>
 
-		<div class="overlayUi"><div id="filterboxCont"><div class="card text-white bg-dark p-3">
+		<div class="overlayUi"><div id="filterboxCont"><div class="card border-dark p-3">
 			<h3>Data Controls</h3>
 			<hr/>
 			<div class="form-group">
 				<label >Model Type:</label>
-				<select class="form-control">
-					<option selected>Past data</option>
-					<option>Predictive</option>
+				<select class="form-control" v-model="filters.modelType">
+					<option value="past" selected>Past data</option>
+					<option value="predict" >Predictive</option>
 				</select>
 			</div>
 			<div class="form-group">
@@ -30,14 +32,50 @@
 				<label>Date:</label>
 				<input type="date" class="form-control" v-model="filters.date" @change="filter()"/>
 			</div>
-			<div class="form-group">
-				<label>Weather:</label>
-				<select class="form-control">
-				</select>
+
+			<div v-if="filters.modelType=='predict'">
+				<h4>Predictive inputs</h4>
+				<div class="form-group">
+					<label>Weather Type:</label>
+					<select class="form-control" v-model="filters.predictWeatherType">
+						<option value="fog"> fog </option>
+						<option value="light_shower"> light_shower </option>
+						<option value="rain"> rain </option>
+						<option value="hazy"> hazy </option>
+						<option value="storm"> storm </option>
+						<option value="clear"> clear </option>
+						<option value="sunny"> sunny </option>
+						<option value="shower"> shower </option>
+						<option value="cloudy"> cloudy </option>
+						<option value="mostly_sunny"> mostly_sunny </option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Temperature Min(℃):</label>
+					<input type="number" class="form-control" v-model="filters.predictTemperatureMin" />
+				</div>
+				<div class="form-group">
+					<label>Temperature Max(℃):</label>
+					<input type="number" class="form-control" v-model="filters.predictTemperatureMax" />
+				</div>
+				<div class="form-group">
+					<label>Rainfall Max(mm):</label>
+					<input type="number" class="form-control" v-model="filters.predictRainfallMax" />
+				</div>
+				<div class="form-group">
+					<label>rainfall Min(mm):</label>
+					<input type="number" class="form-control" v-model="filters.predictRainfallMin" />
+				</div>
+				<div class="form-group">
+					<label>UV Max Index:</label>
+					<input type="number" class="form-control" v-model="filters.predictUVMax" />
+				</div>
+
 			</div>
+
 		</div></div></div>
 
-		<div v-if="filters.selectedDuocode!=''" id="overlayUi"><div id="infoboxCont"><div class="card text-white bg-dark p-3">
+		<div v-if="filters.selectedDuocode!=''" class="overlayUi"><div id="infoboxCont"><div class="card border-dark p-3">
 			<h3>Data Point Info</h3>
 			<hr/>
 			<strong>Selected data point: </strong> {{filters.selectedDuocode}}
@@ -59,7 +97,6 @@
 						<h6 class="card-subtitle mb-2 text-muted">About</h6>
 						<p class="card-text">
 							SVIS-APP is a 3d visualisation tool for solar data <br/>
-							
 						</p>
 						<hr/>
 						<h6 class="card-subtitle mb-2 text-muted">How to use</h6>
@@ -106,7 +143,16 @@
 					time: '56',
 					timeText: '...',
 					selectedDuocode: '',
-					hoveredDuocode: ''
+					hoveredDuocode: '',
+
+					modelType: 'past',
+
+					predictWeatherType: "clear",
+					predictTemperatureMin: 20,
+					predictTemperatureMax: 30,
+					predictUVMax: 10,
+					predictRainfallMin: 0,
+					predictRainfallMax: 0
 				},
 				filteredData : [],
 				infoPaneVisible: false
@@ -136,6 +182,19 @@
 				}).then( jdata => {
 					//console.log(jdata)
 					this.weather_data = jdata
+					return jdata
+				});
+				return null
+			},
+
+			//TODO: sync with UI
+			fetchPredictiveData : async function () {
+				fetch("http://"+window.location.hostname+":8800/predict")
+				.then( response => {
+					return response.json()
+				}).then( jdata => {
+					//console.log(jdata)
+					this.predict_data = jdata
 					return jdata
 				});
 				return null
@@ -200,7 +259,7 @@
 }
 
 #infoboxCont{
-	position: absolute; left: 20px; bottom: 20px; width:25em;
+	position: absolute; left: calc(100vw - 20px - 25em); top: 20px; width:25em;
 }
 
 #filterboxCont{
