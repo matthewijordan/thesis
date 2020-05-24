@@ -82,12 +82,11 @@ def pre_load_weather_data(force=False):
         weather_cache.update(weather_cache_old)
         # go through each duocode key (dck) and merge against list in weather cache
         for dck in temp_weather_cache:
-            if dck == "updated_dt": pass
+            if dck == "updated_dt": continue
             for newWeather in temp_weather_cache[dck]:
-                if dck == "updated_dt": pass
-                print(newWeather)
+                if newWeather == "updated_dt": continue
                 replaced = 0
-                for oldWeatherIx in weather_cache[dck]:
+                for oldWeatherIx in range(len(weather_cache[dck])):
                     if weather_cache[dck][oldWeatherIx]["date"][0:10] == newWeather["date"][0:10]:
                         weather_cache[dck][oldWeatherIx] = newWeather
                 if not replaced:
