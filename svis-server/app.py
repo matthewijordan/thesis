@@ -42,12 +42,13 @@ def get_data(date = None, is_request=1):
         print("[SVIS-SERVER] Fetching from origin date" + date)
         d = fetch_data(date)
         data_cache[date] = d
+        if is_request: 
+            print("[SVIS-SERVER] saving cache")
+            with open('./data_cache.json', 'w+') as f:
+                json.dump(data_cache, f)
     else:
         print("[SVIS-SERVER] Fetching from cache date" + date)
     if is_request: 
-        print("[SVIS-SERVER] saving cache")
-        with open('./data_cache.json', 'w+') as f:
-            json.dump(data_cache, f)
         return jsonify({
             date : d
         })
@@ -105,11 +106,16 @@ def pre_load_weather_data(force=False):
             for newWeather in temp_weather_cache[dck]:
                 if newWeather == "updated_dt": continue
                 replaced = 0
-                for oldWeatherIx in range(len(weather_cache[dck])):
-                    if weather_cache[dck][oldWeatherIx]["date"][0:10] == newWeather["date"][0:10]:
-                        weather_cache[dck][oldWeatherIx] = newWeather
+                if dck in weather_cache:
+                    for oldWeatherIx in range(len(weather_cache[dck])):
+                        if weather_cache[dck][oldWeatherIx]["date"][0:10] == newWeather["date"][0:10]:
+                            weather_cache[dck][oldWeatherIx] = newWeather
+                            replaced = 1
                 if not replaced:
-                    weather_cache[dck].append(newWeather)
+                    if dck in weather_cache:
+                        weather_cache[dck].append(newWeather)
+                    else:
+                        weather_cache[dck] = [newWeather]
         print("[SVIS-SERVER] saving cache")
         with open('./weather_cache.json', 'w+') as f:
             json.dump(weather_cache, f)
