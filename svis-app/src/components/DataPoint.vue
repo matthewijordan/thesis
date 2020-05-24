@@ -44,7 +44,7 @@
                 this.dataPointBab.getChildren().forEach( (m) => {
                     m.appdata = { id: dp.duocode }
                     if(m.name=='boxPoint'){
-                        console.log(m)
+                        //console.log(m)
                     }
                 } )
             },

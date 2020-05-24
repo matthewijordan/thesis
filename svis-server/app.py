@@ -75,8 +75,23 @@ def pre_load_weather_data(force=False):
             search_criteria = dc[0]+"00" if dc[1] is None else dc[1]
             w = wapi.WeatherApi(search=search_criteria, debug=0)
             temp_weather_cache[dc[0]] = w.forecasts_daily()
+        # merge the cache so we dont lose old data
         print("[SVIS-SERVER] Merging cache")
-        weather_cache.update({ **weather_cache_old, **temp_weather_cache })
+        global weather_cache
+        # add old values to cache
+        weather_cache.update(weather_cache_old)
+        # go through each duocode key (dck) and merge against list in weather cache
+        for dck in temp_weather_cache:
+            if dck == "updated_dt": pass
+            for newWeather in temp_weather_cache[dck]:
+                if dck == "updated_dt": pass
+                print(newWeather)
+                replaced = 0
+                for oldWeatherIx in weather_cache[dck]:
+                    if weather_cache[dck][oldWeatherIx]["date"][0:10] == newWeather["date"][0:10]:
+                        weather_cache[dck][oldWeatherIx] = newWeather
+                if not replaced:
+                    weather_cache[dck].append(newWeather)
         print("[SVIS-SERVER] saving cache")
         with open('./weather_cache.json', 'w+') as f:
             json.dump(weather_cache, f)
@@ -92,7 +107,6 @@ def pre_load_weather_data(force=False):
 def do_before():
     pre_load_solar_data()
     pre_load_weather_data()
-
 
 
 if __name__ == "__main__":

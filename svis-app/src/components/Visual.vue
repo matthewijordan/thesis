@@ -53,20 +53,13 @@
                 return dp
             },
 
-            selectDataPoint: function() {
-                //var result = this.scene.pick(this.scene.pointerX, this.scene.pointerY)
-                //console.log(result)
-                console.log('test')
-            },
-
             onScene: function(scene) {
                 // store for later...
                 this.scene = scene
                 var self = this
                 scene.onPointerDown = function (evt, res) {
-                    console.log(res)
                     if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
-                        console.log(self)
+                        //console.log(self)
                         self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
                     }
                 }

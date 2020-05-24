@@ -30,8 +30,9 @@
 			</div>
 			<div class="form-group">
 				<label>Date:</label>
-				<input type="date" class="form-control" v-model="filters.date" @change="filter()"/>
+				<input type="date" class="form-control" v-model="filters.date" @input="filter()"/>
 			</div>
+			<div class="alert alert-danger" role="alert" v-if="errors.dateSelect && filters.modelType=='past'">No Weather Data</div>
 
 			<div v-if="filters.modelType=='predict'">
 				<h4>Predictive inputs</h4>
@@ -59,12 +60,12 @@
 					<input type="number" class="form-control" v-model="filters.predictTemperatureMax" />
 				</div>
 				<div class="form-group">
-					<label>Rainfall Max(mm):</label>
-					<input type="number" class="form-control" v-model="filters.predictRainfallMax" />
+					<label>Rainfall Min(mm):</label>
+					<input type="number" class="form-control" v-model="filters.predictRainfallMin" />
 				</div>
 				<div class="form-group">
-					<label>rainfall Min(mm):</label>
-					<input type="number" class="form-control" v-model="filters.predictRainfallMin" />
+					<label>Rainfall Max(mm):</label>
+					<input type="number" class="form-control" v-model="filters.predictRainfallMax" />
 				</div>
 				<div class="form-group">
 					<label>UV Max Index:</label>
@@ -76,9 +77,22 @@
 		</div></div></div>
 
 		<div v-if="filters.selectedDuocode!=''" class="overlayUi"><div id="infoboxCont"><div class="card border-dark p-3">
-			<h3>Data Point Info</h3>
+			<h3>Selected Data Point Info</h3>
 			<hr/>
-			<strong>Selected data point: </strong> {{filters.selectedDuocode}}
+			<h5>Base info:</h5>
+			<strong>Type: </strong> Duocode (two digit postcode)
+			<strong>Name: </strong> {{filters.selectedDuocode}} 
+			<strong>Location: </strong> (Long: {{duocodes[filters.selectedDuocode]["long"]}},Lat: {{duocodes[filters.selectedDuocode]["lat"]}})
+			<h5>PV info:</h5>
+
+			<h5>Weather info:</h5>
+			<div class="alert alert-danger" role="alert" v-if="weatherPoint(filters.selectedDuocode).icon_descriptor==null">No Weather Data</div>
+			<div v-if="weatherPoint(filters.selectedDuocode).icon_descriptor!=null">
+				<strong>Short description: </strong> <br/>
+				{{weatherPoint(filters.selectedDuocode).icon_descriptor}}
+				<span style="font-size:1rem;">{{ weatherIcon(weatherPoint(filters.selectedDuocode).icon_descriptor) }}</span>
+			</div>
+			
 		</div></div></div>
 
 		<!-- RENDER VISUAL HERE -->
@@ -111,7 +125,6 @@
 							<a href="https://github.com/matthewijordan/thesis">GitHub.com</a>
 						</p>
 						<hr/>
-						
 						<a href="#" class="card-link" @click="infoPaneVisible=false">Close</a>
 					</div>
 				</div>
@@ -139,10 +152,10 @@
 				weatherData: {},
 				duocodes: duocodes,
 				filters : {
-					date: '2020-03-07',
+					date: '2020-05-22',
 					time: '56',
 					timeText: '...',
-					selectedDuocode: '',
+					selectedDuocode: '52',
 					hoveredDuocode: '',
 
 					modelType: 'past',
@@ -153,6 +166,9 @@
 					predictUVMax: 10,
 					predictRainfallMin: 0,
 					predictRainfallMax: 0
+				},
+				errors : {
+					dateSelect: false
 				},
 				filteredData : [],
 				infoPaneVisible: false
@@ -181,7 +197,7 @@
 					return response.json()
 				}).then( jdata => {
 					//console.log(jdata)
-					this.weather_data = jdata
+					this.weatherData = jdata
 					return jdata
 				});
 				return null
@@ -203,9 +219,14 @@
 			// apply filters
 			filter: function () {
 				this.fetchDataByDay(this.filters.date).then( () => {
+					if (this.appData[this.filters.date]["postcode"].length == 0){
+						this.errors.dateSelect = true
+						return;
+					}
+					this.errors.dateSelect = false
 					// new moment from date
 					var datetime = moment(this.filters.date).utcOffset('+1000')//.tz('Australia/NSW')
-					console.log(datetime.format());
+					//console.log(datetime.format());
 					// add minutes to datetime
 					datetime = datetime.add(this.filters.time * 15, 'minutes');
 					// minutes to display
@@ -229,12 +250,57 @@
 
 			setHoverDuocode: async function (duocode) {
 				this.filters.hoveredDuocode = duocode;
+			},
+
+			weatherIcon: function (weatherIconName) {
+				switch (weatherIconName){
+					case "fog":
+						return "🌫"
+					case "light_shower":
+						return "🚿"
+					case "rain":
+						return "🌧🌧"
+					case "hazy":
+						return "🌫"
+					case "storm":
+						return "⛈"
+					case "clear":
+						return "🌤"
+					case "sunny":
+						return "☀"
+					case "shower":
+						return "🚿🚿"
+					case "cloudy":
+						return "☁"
+					case "mostly_sunny":
+						return "⛅"
+					default:
+						return "⁉";
+				}
+			},
+
+			weatherPoint: function (duocode){
+				var thisWeather = {icon_descriptor:null}
+				if ( typeof this.weatherData[duocode] == 'undefined') {
+					return thisWeather
+				}
+				for (var i = 0; i < this.weatherData[duocode].length; i++){
+					if (this.weatherData[duocode][i].date.includes(this.filters.date)){
+						thisWeather = this.weatherData[duocode][i]
+					}
+				}
+				return thisWeather
 			}
 
 		},
 		beforeMount: async function () {
 			await this.fetchWeatherData()
 			this.filter()
+		},
+		watch: {
+			selectedDuocode: function () {
+				console.log("change")
+			}
 		}
 	}
 
