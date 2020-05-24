@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, json
 import requests
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from weather_au import api as wapi
 
@@ -34,8 +34,9 @@ def fetch_data(date):
     return json_resp
 
 @app.route("/data/<string:date>")
-def get_data(date = None):
+def get_data(date = None, is_request=1):
     print("[SVIS-SERVER] request for date " + date)
+    global data_cache
     d = data_cache.get(date)
     if d is None:
         print("[SVIS-SERVER] Fetching from origin date" + date)
@@ -43,9 +44,15 @@ def get_data(date = None):
         data_cache[date] = d
     else:
         print("[SVIS-SERVER] Fetching from cache date" + date)
-    return jsonify({
-        date : d
-    })
+    if is_request: 
+        print("[SVIS-SERVER] saving cache")
+        with open('./data_cache.json', 'w+') as f:
+            json.dump(data_cache, f)
+        return jsonify({
+            date : d
+        })
+    else:
+        return None
 
 
 @app.route("/weather_data")
@@ -53,9 +60,21 @@ def get_weather_data(date = None):
     return jsonify(weather_cache)
 
 def pre_load_solar_data():
-    print("[SVIS-SERVER] filling cache")
-    today = datetime.today().strftime('%Y-%m-%d')
-    fetch_data(today)
+    print("[SVIS-SERVER] Trying to load data cache")
+    global data_cache
+    try:
+        with open('./data_cache.json') as f:
+            data_cache = json.load(f)
+    except IOError:
+        print("[SVIS-SERVER] No existing data cache file, fetching 365 days of data")
+        for i in range(400):
+            dayToFetch = datetime.today() - timedelta(days=i)
+            print("[SVIS-SERVER] Pre-fetching data for d-" + str(i))
+            get_data(dayToFetch.strftime('%Y-%m-%d'), is_request=0)
+    get_data(datetime.today().strftime('%Y-%m-%d'), is_request=0)
+    print("[SVIS-SERVER] saving cache")
+    with open('./data_cache.json', 'w+') as f:
+        json.dump(data_cache, f)
     return None
 
 def pre_load_weather_data(force=False):
