@@ -34,7 +34,7 @@
 			</div>
 			<div class="form-group">
 				<label>Date:</label>
-				<input type="date" class="form-control" v-model="filters.date" @input="filter()" :disabled="filterWait" />
+				<input type="date" class="form-control" v-model="filters.date" @input="filter()" />
 			</div>
 			<div class="alert alert-danger" role="alert" v-if="errors.dateSelect && filters.modelType=='past'">No PV data available</div>
 
