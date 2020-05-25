@@ -7,7 +7,7 @@
 				<span class="navbar-text">3D visualisation for australian PV data </span>
 			</div>
 			<div>
-				<a @click="infoPaneVisible=true" href="">
+				<a @click="infoPaneVisible=true" href="#">
 					<i class="fa fa-info-circle fa-2x" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -18,6 +18,7 @@
 		</div> </div>
 
 		<div class="overlayUi"><div id="filterboxCont"><div class="card border-dark p-3">
+			<!-- ----------- DATA CONTROLS--------------------------------------------- -->
 			<h3>Data Controls</h3>
 			<hr/>
 			<div class="form-group">
@@ -38,6 +39,7 @@
 			</div>
 			<div class="alert alert-danger" role="alert" v-if="errors.dateSelect && filters.modelType=='past'">No PV data available</div>
 
+			<!-- PREDICTIVE MODEL INPUTS --------------------------------------------- -->
 			<div v-if="filters.modelType=='predict'">
 				<h4>Predictive inputs</h4>
 				<div class="form-group">
@@ -84,6 +86,7 @@
 
 		</div></div></div>
 
+		<!-- INFO ON SELECTED POINT --------------------------------------------- -->
 		<div v-if="filters.selectedDuocode!=''" class="overlayUi"><div id="infoboxCont"><div class="card border-dark p-3">
 			<h3>Selected Data Point Info</h3>
 			<hr/>
@@ -128,6 +131,7 @@
 			<Visual :filteredData="filteredData" @setSelectedDuocode="setSelectedDuocode" :filters="filters" />
 		</div>
 
+		<!-- INFO/HELP PANE --------------------------------------------- -->
 		<div id="InfoPane" class="overlayUi" v-if="infoPaneVisible">
 			<div id="infoPaneBackground" @click="infoPaneVisible=false">
 			</div>
@@ -139,6 +143,8 @@
 						<h6 class="card-subtitle mb-2 text-muted">About</h6>
 						<p class="card-text">
 							SVIS-APP is a 3d visualisation tool for solar data <br/>
+							SVIS is written using vue and babylon JS <br/>
+							<strong>For best results use the latest chrome build</strong> <br/>
 						</p>
 						<hr/>
 						<h6 class="card-subtitle mb-2 text-muted">How to use</h6>
