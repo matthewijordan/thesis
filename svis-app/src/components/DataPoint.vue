@@ -1,20 +1,26 @@
 <template>
 	<!-- <box :position="[dataPoint.x,dataPoint.value,dataPoint.y]" v-model="dataPointBab"></box> -->
     <entity v-model="dataPointBab" @complete="onComplete">
-        <box :position="[dataPoint.x,dataPoint.value*0.5,dataPoint.y]" :name="'boxPoint'">
+        <!--<box :position="[dataPoint.x,dataPoint.value*0.5,dataPoint.y]" :name="'boxPoint'">
             <Material v-if="isPicked" diffuse="#F00"></Material>
-        </box>
+        </box>-->
 
-        <PolygonMesh
+        <ExtrudePolygon 
+            v-for="p in dataPointGeom"
+            :key="`${p.id}`"
+            
             :options="{
-                shape: [
-                    [100,0,0],
-                    [0,0,0],
-                    [0,0,100]
-                ],
-                sideOrientation: 2
+                shape: p.shape,
+                holes: p.holes,
+                sideOrientation: 2,
+                depth: 1
             }"
-        />
+
+            :scaling="[1,(-dataPoint.value*0.5) || (-0.01),1]"
+        >
+            <Material v-if="isPicked" diffuse="#F00" :alpha=1></Material>
+            <Material v-if="!isPicked && pickMode" diffuse="#FFF" :alpha=0.2></Material>
+        </ExtrudePolygon>
         
     </entity>
     
@@ -26,12 +32,14 @@
         
         props: [
             'dataPoint',
-            'isPicked'
+            'isPicked',
+            'pickMode'
         ],
 
         data: function(){
             return {
-                dataPointBab: null 
+                dataPointBab: null,
+                dataPointGeom: this.transformShapedata(this.dataPoint.shapedata)
             }
         },
 
@@ -43,6 +51,7 @@
                 let dp = this.dataPoint
                 this.dataPointBab.getChildren().forEach( (m) => {
                     m.appdata = { id: dp.duocode }
+                    //console.log(m)
                     if(m.name=='boxPoint'){
                         //console.log(m)
                     }
@@ -50,29 +59,34 @@
             },
 
             // shapedata to vector 3
-            transformShapedata: function() {
-                return [
+            transformShapedata: function(shapedata) {
+                var geometry = []
+                
+                var polyID = 0
+                if (shapedata.type == "single") {
+                    let shape = shapedata.coordinates[0].map( (p) => {
+                        return {x:p[0],y:0,z:p[1]}
+                    } )
+                    geometry[0] = { shape: shape, id: polyID, holes: null }
+                } else {
+                    shapedata.coordinates.forEach( (sd) => {
+                        let shape = sd[0].map( (p) => {
+                            return {x:p[0],y:0,z:p[1]}
+                        } )
+                        geometry.push( { shape: shape, id: polyID, holes: null } )
+                        polyID+=1;
+                    } )
+                }
 
-                ]
+                return geometry
             }
         },
 
         watch: {
             //I guess this is useless now
-           dataPointBab: function () {
-               //let dp = this.dataPoint
-               //this.dataPointBab.position.x = dp.x;
-               //this.dataPointBab.position.y = dp.value*0.5;
-               //this.dataPointBab.position.z = dp.y;
-
-               // register the ID/duocode so we can identify the mesh
-               //this.dataPointBab.
-               //console.log(this.dataPointBab.getChildren())
-               //for (var i in this.dataPointBab.getChildren()) {
-               //    console.log(i)
-               //}
-               //this.dataPointBab.appdata = { id: dp.duocode }
-           }
+            dataPointBab: function () {
+               
+            }
         }
 
     }

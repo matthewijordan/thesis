@@ -101,7 +101,7 @@
 			<strong>Maximum capacity (MW): </strong>
 			{{typeof this.appData[this.filters.date] == "undefined" ? "Capacity unnavailable" : this.appData[this.filters.date]["postcodeCapacity"][filters.selectedDuocode]}}
 			<strong>Utilization: </strong>
-			{{ typeof this.filteredData[filters.selectedDuocode] == 'undefined' ? "Error⁉": this.filteredData[filters.selectedDuocode] }}%
+			{{ typeof this.filteredData[filters.selectedDuocode] == 'undefined' ? "∅": this.filteredData[filters.selectedDuocode] }}%
 			<div class="progress">
 				<div class="progress-bar bg-success" role="progressbar" :style="'width: '+ this.filteredData[filters.selectedDuocode] +'%'" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
 			</div>

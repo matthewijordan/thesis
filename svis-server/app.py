@@ -4,6 +4,7 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 import json
 from weather_au import api as wapi
+import numpy as np
 
 app = Flask(__name__)
 # allow X-origin requests
@@ -131,6 +132,15 @@ def pre_load_weather_data(force=False):
 def do_before():
     pre_load_solar_data()
     pre_load_weather_data()
+    train_model()
+
+def train_model():
+    duocodes_pos = {}
+    with open('../svis-app/src/data/duocodes.json') as f:
+        duocodes_pos = json.load(f)
+    dataPoints = []
+    m=0
+    return m
 
 
 if __name__ == "__main__":

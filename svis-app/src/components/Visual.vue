@@ -1,8 +1,23 @@
 <template>
 	<div id="vis-container">
         <Scene @scene="onScene" :environment="{createSkybox:false, createGround:false}">
-                <!-- <box v-for="dp in dataPoints()" :position="[dp.x,dp.value,dp.y]" :key="`${dp.x},${dp.value},${dp.y}`"></box> -->
-                <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.duocode}`" :isPicked="dp.duocode==filters.selectedDuocode"/>
+                <Camera v-model="camera"
+                    :type="'arcRotate'"
+                    :target="[10,0,]"
+                    :position="[10,100,-50]"
+                ></Camera>
+                <SpotLight :direction="[0,-1,0]" :position="[0,200,0]" specular="#FF0000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,100]" specular="#FF0000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,-100]" specular="#FF0000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,-100]" specular="#FF0000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,100]" specular="#FF0000"></SpotLight>
+
+                <entity :position="[-120,0,20]">
+                    <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.duocode}`" 
+                        :isPicked="dp.duocode==filters.selectedDuocode"
+                        :pickMode="filters.selectedDuocode!=''"
+                    />
+                </entity>
         </Scene>
 	</div>
 </template>
@@ -24,7 +39,8 @@
             return {
                 duocodes: duocodes,
                 // babylon objects { 'duocode' : obj }
-                scene: null
+                scene: null,
+                camera: null
             }
         },
 
@@ -61,6 +77,8 @@
                     if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
                         //console.log(self)
                         self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
+                    } else {
+                        self.$emit('setSelectedDuocode', '')
                     }
                 }
 
