@@ -57,10 +57,10 @@ def build_data():
                     # numericise short desc
                     
                     short_desc  = {"windy" : 1, "fog" : 2, "light_shower" : 3, "rain" : 4, "hazy" : 2, "storm" : 6, "clear" : 1, "sunny" : 0, "shower" : 5, "cloudy" : 3, "mostly_sunny" : 1}[wd['icon_descriptor']]
-                    temp_min    = int(wd['temp_min'] or 0)
-                    temp_max    = int(wd['temp_max'] or 0)
-                    rain_min    = int(wd['rain']['amount']['min'] or 0)
-                    rain_max    = int(wd['rain']['amount']['max'] or 0)
+                    temp_min    = float(wd['temp_min'] or 0)
+                    temp_max    = float(wd['temp_max'] or 0)
+                    rain_min    = float(wd['rain']['amount']['min'] or 0)
+                    rain_max    = float(wd['rain']['amount']['max'] or 0)
                 
                 df.append( [
                     x,
@@ -76,33 +76,35 @@ def build_data():
                 ] )
     return df[0:20]
 
-def train_ml():
+
+
+if __name__ == '__main__':
     # load dataset
     #build_data()
-    dataframe = DataFrame.from_dict(build_data())
+    data = build_data()
+    dataframe = DataFrame.from_dict(data)
     dataset = dataframe.values
     # split into input (X) and output (Y) variables
     X = dataset[:,0:8]
     Y = dataset[:,9]
     # define wider model
-    def wider_model():
-        # create model
-        model = Sequential()
-        model.add(Dense(8, input_dim=8, kernel_initializer='normal', activation='relu'))
-        model.add(Dense(4, input_dim=8, kernel_initializer='normal', activation='relu'))
-        model.add(Dense(1, kernel_initializer='normal'))
-        # Compile model
-        model.compile(loss='mean_squared_error', optimizer='adam')
-        return model
-    # evaluate model with standardized dataset
-    estimators = []
-    estimators.append(('standardize', StandardScaler()))
-    estimators.append(('mlp', KerasRegressor(build_fn=wider_model, epochs=100, batch_size=5, verbose=0)))
-    pipeline = Pipeline(estimators)
-    kfold = KFold(n_splits=10)
-    results = cross_val_score(pipeline, X, Y, cv=kfold)
-    print("Wider: %.2f (%.2f) MSE" % (results.mean(), results.std()))
-    print('done')
 
-if __name__ == '__main__':
-    train_ml()
+    # create model
+    model = Sequential()
+    model.add(Dense(8, input_dim=8, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(4, input_dim=8, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(1, kernel_initializer='normal'))
+    # Compile model
+    model.compile(loss='mean_squared_error', optimizer='adam')
+
+    history = model.fit(X,Y,batch_size=5, epochs=5)
+    
+    # evaluate model with standardized dataset
+    #estimators = []
+    #estimators.append(('standardize', StandardScaler()))
+    #estimators.append(('mlp', KerasRegressor(build_fn=wider_model, epochs=100, batch_size=5, verbose=0)))
+    #pipeline = Pipeline(estimators)
+    #kfold = KFold(n_splits=10)
+    #results = cross_val_score(pipeline, X, Y, cv=kfold)
+    #print("Wider: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+    print('done')
