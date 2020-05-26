@@ -88,7 +88,8 @@ def train_ml():
     def wider_model():
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=8, kernel_initializer='normal', activation='relu'))
+        model.add(Dense(8, input_dim=8, kernel_initializer='normal', activation='relu'))
+        model.add(Dense(4, input_dim=8, kernel_initializer='normal', activation='relu'))
         model.add(Dense(1, kernel_initializer='normal'))
         # Compile model
         model.compile(loss='mean_squared_error', optimizer='adam')
