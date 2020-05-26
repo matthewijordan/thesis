@@ -18,8 +18,7 @@
 
             :scaling="[1,(-dataPoint.value*0.5) || (-0.01),1]"
         >
-            <Material v-if="isPicked" diffuse="#F00" :alpha=1></Material>
-            <Material v-if="!isPicked && pickMode" diffuse="#FFF" :alpha=0.2></Material>
+            <Material :alpha="matterialProps().alpha" :diffuse="matterialProps().diffuse" :roughness="matterialProps().roughness" ></Material>
         </ExtrudePolygon>
         
     </entity>
@@ -44,6 +43,15 @@
         },
 
         methods: {
+
+            matterialProps: function(){
+                let mp={ diffuse : "#ccffcc", alpha : 1 , roughness : 0.9}
+                if (this.isPicked) mp.diffuse="#F00"
+                if (!this.isPicked && this.pickMode){
+                    mp.diffuse="#FFF"; mp.alpha=0.2
+                }
+                return mp
+            },
 
             // Once all sub entities/meshes are ready
             onComplete: function() {

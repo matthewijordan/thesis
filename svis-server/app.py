@@ -39,7 +39,7 @@ def get_data(date = None, is_request=1):
     print("[SVIS-SERVER] request for date " + date)
     global data_cache
     d = data_cache.get(date)
-    if d is None:
+    if d is None or len(d.get('postcode',[]))==0:
         print("[SVIS-SERVER] Fetching from origin date" + date)
         d = fetch_data(date)
         data_cache[date] = d
@@ -48,13 +48,8 @@ def get_data(date = None, is_request=1):
             with open('./data_cache.json', 'w+') as f:
                 json.dump(data_cache, f)
     else:
-        print("[SVIS-SERVER] Fetching from cache date" + date)
-    if is_request: 
-        return jsonify({
-            date : d
-        })
-    else:
-        return None
+        print("[SVIS-SERVER] Fetching from cache date " + date)
+    return jsonify({date : d})
 
 
 @app.route("/weather_data")
@@ -135,12 +130,21 @@ def do_before():
     train_model()
 
 def train_model():
+    # build data
     duocodes_pos = {}
     with open('../svis-app/src/data/duocodes.json') as f:
         duocodes_pos = json.load(f)
     dataPoints = []
-    m=0
-    return m
+    
+    # params
+    learning_rate = 0.1
+    training_iteration = 30
+    batch_size = 100
+    display_step = 2
+    
+    # 
+
+    return None
 
 
 if __name__ == "__main__":

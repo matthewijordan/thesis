@@ -3,17 +3,34 @@
         <Scene @scene="onScene" :environment="{createSkybox:false, createGround:false}">
                 <Camera v-model="camera"
                     :type="'arcRotate'"
-                    :target="[10,0,0]"
-                    :position="[10,100,-50]"
+                    :target="$vector(camTarget.x,camTarget.y,camTarget.z)"
+                    :radius="100"
                 ></Camera>
 
-                <SpotLight :direction="[0,-1,0]" :position="[0,200,0]" specular="#FF0000"></SpotLight>
-                <SpotLight :direction="[0,-1,0]" :position="[100,200,100]" specular="#FF0000"></SpotLight>
-                <SpotLight :direction="[0,-1,0]" :position="[-100,200,-100]" specular="#FF0000"></SpotLight>
-                <SpotLight :direction="[0,-1,0]" :position="[100,200,-100]" specular="#FF0000"></SpotLight>
-                <SpotLight :direction="[0,-1,0]" :position="[-100,200,100]" specular="#FF0000"></SpotLight>
+                <!--<SpotLight :direction="[0,-1,0]" :position="[0,200,0]" specular="#000000"></SpotLight>
 
-                <entity :position="[-120,0,20]">
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,-100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,-100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,100]" specular="#000000"></SpotLight>
+
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,-100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[100,200,-100]" specular="#000000"></SpotLight>
+                <SpotLight :direction="[0,-1,0]" :position="[-100,200,100]" specular="#000000"></SpotLight>-->
+                <HemisphericLight diffuse="#888" :direction="[0,1,1]" :position="[origin.x,300,origin.y]"></HemisphericLight>
+                <DirectionalLight specular="#FFF" diffuse="#FFF" :direction="[0,-1,0]"></DirectionalLight>
+                <DirectionalLight  diffuse="#ffcc99" :direction="[0,-1,1]"></DirectionalLight>
+
+                <PointLight specular="#ff0000"
+                    :position="[origin.x,100,origin.y]"
+                />
+
+                <Disc :scaling="[100,100,1]" :rotation="[3.14159/2,0,0]" :position="[origin.x,-0.1,origin.z]">
+                    <Material diffuse="#00F" :alpha="0.1" :roughness="1"></Material>
+                </Disc>
+                
+                <entity>
                     <DataPoint v-for="dp in dataPoints()" :dataPoint="dp" :key="`${dp.duocode}`" 
                         :isPicked="dp.duocode==filters.selectedDuocode"
                         :pickMode="filters.selectedDuocode!=''"
@@ -27,6 +44,8 @@
 
     import duocodes from '../data/duocodes.json'
     import DataPoint from './DataPoint.vue'
+
+    //import babhelp from 'vue-babylonjs' 
 
     export default {
         name: 'Visual',
@@ -42,7 +61,9 @@
                 // babylon objects { 'duocode' : obj }
                 scene: null,
                 camera: null,
-                pointerTrack: null
+                pointerTrack: null,
+                camTarget: { x:132, y:0, z:-16 },
+                origin: {x:132, y:0, z:-24}
             }
         },
 
@@ -72,17 +93,8 @@
             },
 
             onScene: function(scene) {
-                // store for later...
                 this.scene = scene
                 var self = this
-                //scene.onPointerDown = function (evt, res) {
-                //    if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
-                //        //console.log(self)
-                //        self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
-                //    } else {
-                //        self.$emit('setSelectedDuocode', '')
-                //    }
-                //}
 
                 scene.onPointerObservable.add((pointerInfo) => {
                     var pm = pointerInfo.pickInfo.pickedMesh;
@@ -97,6 +109,10 @@
                         case 2: //pointer up
                             if (pm != null && 'appdata' in pm && self.pointerTrack == pm.appdata.id){
                                 self.$emit('setSelectedDuocode', pm.appdata.id)
+                                //self.camera.setTarget( babhelp.$vector(100,100,100) )
+                                self.camTarget.x = duocodes[pm.appdata.id].long
+                                self.camTarget.y = 0
+                                self.camTarget.z = duocodes[pm.appdata.id].lat
                             } else if (self.pointerTrack == '') {
                                 self.$emit('setSelectedDuocode', "")
                             }
@@ -115,6 +131,13 @@
             }
 
         },
+
+        watch: {
+            camera: function() {
+                this.camera.alpha = -1.561667910668399
+                this.camera.beta = 0.7990808589426004
+            }
+        }
     }
 
 </script>

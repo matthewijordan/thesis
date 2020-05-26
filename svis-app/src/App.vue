@@ -189,7 +189,7 @@
 					date: '2020-05-22',
 					time: '56',
 					timeText: '...',
-					selectedDuocode: '52',
+					selectedDuocode: '',
 					hoveredDuocode: '',
 
 					modelType: 'past',
@@ -219,7 +219,7 @@
 					.then( response => {
 						return response.json()
 					}).then( jdata => {
-						//console.log(jdata)
+						console.log(jdata)
 						this.appData[day] = jdata[day]
 						return jdata
 					});
