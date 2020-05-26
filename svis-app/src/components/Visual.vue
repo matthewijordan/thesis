@@ -40,7 +40,8 @@
                 duocodes: duocodes,
                 // babylon objects { 'duocode' : obj }
                 scene: null,
-                camera: null
+                camera: null,
+                pointerTrack: null
             }
         },
 
@@ -73,14 +74,31 @@
                 // store for later...
                 this.scene = scene
                 var self = this
-                scene.onPointerDown = function (evt, res) {
-                    if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
-                        //console.log(self)
-                        self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
-                    } else {
-                        self.$emit('setSelectedDuocode', '')
+                //scene.onPointerDown = function (evt, res) {
+                //    if(res.pickedMesh != null && 'appdata' in res.pickedMesh) {
+                //        //console.log(self)
+                //        self.$emit('setSelectedDuocode', res.pickedMesh.appdata.id)
+                //    } else {
+                //        self.$emit('setSelectedDuocode', '')
+                //    }
+                //}
+
+                scene.onPointerObservable.add((pointerInfo) => {
+                    var pm = pointerInfo.pickInfo.pickedMesh;
+                    switch (pointerInfo.type) {
+                        case 1: // pointer down
+                            if (pm != null && 'appdata' in pm){
+                                self.pointerTrack = pm.appdata.id
+                            }
+                            break;
+                        case 2: //pointer up
+                            if (pm != null && 'appdata' in pm && self.pointerTrack == pm.appdata.id){
+                                self.$emit('setSelectedDuocode', pm.appdata.id)
+                            }
+                            break;
                     }
-                }
+
+                });
 
             },
 
