@@ -3,9 +3,10 @@
         <Scene @scene="onScene" :environment="{createSkybox:false, createGround:false}">
                 <Camera v-model="camera"
                     :type="'arcRotate'"
-                    :target="[10,0,]"
+                    :target="[10,0,0]"
                     :position="[10,100,-50]"
                 ></Camera>
+
                 <SpotLight :direction="[0,-1,0]" :position="[0,200,0]" specular="#FF0000"></SpotLight>
                 <SpotLight :direction="[0,-1,0]" :position="[100,200,100]" specular="#FF0000"></SpotLight>
                 <SpotLight :direction="[0,-1,0]" :position="[-100,200,-100]" specular="#FF0000"></SpotLight>
@@ -89,12 +90,19 @@
                         case 1: // pointer down
                             if (pm != null && 'appdata' in pm){
                                 self.pointerTrack = pm.appdata.id
+                            } else {
+                                self.pointerTrack = ''
                             }
                             break;
                         case 2: //pointer up
                             if (pm != null && 'appdata' in pm && self.pointerTrack == pm.appdata.id){
                                 self.$emit('setSelectedDuocode', pm.appdata.id)
+                            } else if (self.pointerTrack == '') {
+                                self.$emit('setSelectedDuocode', "")
                             }
+                            break;
+                        case 4: //pointer move
+                            self.pointerTrack = null
                             break;
                     }
 
