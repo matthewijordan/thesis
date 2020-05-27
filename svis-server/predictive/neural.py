@@ -14,6 +14,8 @@ import json
 import time 
 import datetime 
 
+import numpy as np
+
 fdir = str(Path(__file__).parent)
 
 def build_data():
@@ -74,7 +76,7 @@ def build_data():
                     rain_max,
                     output
                 ] )
-    return df[0:20]
+    return df[0:100000]
 
 
 
@@ -97,14 +99,7 @@ if __name__ == '__main__':
     # Compile model
     model.compile(loss='mean_squared_error', optimizer='adam')
 
-    history = model.fit(X,Y,batch_size=5, epochs=5)
+    history = model.fit(X,Y,batch_size=500, epochs=5)
     
-    # evaluate model with standardized dataset
-    #estimators = []
-    #estimators.append(('standardize', StandardScaler()))
-    #estimators.append(('mlp', KerasRegressor(build_fn=wider_model, epochs=100, batch_size=5, verbose=0)))
-    #pipeline = Pipeline(estimators)
-    #kfold = KFold(n_splits=10)
-    #results = cross_val_score(pipeline, X, Y, cv=kfold)
-    #print("Wider: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+    #model.predict(np.array([[149.3382707, -22.656818504, 145, 375, 1, 0.0, 22.0, 0.0]]))
     print('done')

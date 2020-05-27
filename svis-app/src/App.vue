@@ -37,6 +37,12 @@
 				<label>Date:</label>
 				<input type="date" class="form-control" v-model="filters.date" @input="filter()" />
 			</div>
+			<div class="form-group">
+				<label>Select data point:</label>
+				<select  class="form-control" v-model="filters.selectedDuocode" >
+					<option v-for="dc in Object.keys(duocodes)" :key="'select'+dc" :value="dc" selected>{{dc}}</option>
+				</select>
+			</div>
 			<div class="alert alert-danger" role="alert" v-if="errors.dateSelect && filters.modelType=='past'">No PV data available</div>
 
 			<!-- PREDICTIVE MODEL INPUTS --------------------------------------------- -->
@@ -75,12 +81,8 @@
 						<div class="col-6"><input type="number" class="form-control" v-model="filters.predictRainfallMax" /> </div>
 					</div>
 				</div>
-				<div class="form-group">
-					<label>UV Max Index:</label>
-					<input type="number" class="form-control" v-model="filters.predictUVMax" />
-				</div>
 
-				<button type="button" class="btn btn-primary">Sync predictive model</button>
+				<button type="button" class="btn btn-primary" @click="filter()">Sync predictive model</button>
 
 			</div>
 
@@ -109,7 +111,7 @@
 
 			<h5>Weather info:</h5>
 			<div class="alert alert-danger" role="alert" v-if="weatherPoint(filters.selectedDuocode).icon_descriptor==null">No Weather Data</div>
-			<div v-if="weatherPoint(filters.selectedDuocode).icon_descriptor!=null">
+			<div v-if="weatherPoint(filters.selectedDuocode).icon_descriptor!=null && filters.modelType=='past'">
 				<strong>Short description: </strong> <br/>
 				{{weatherPoint(filters.selectedDuocode).icon_descriptor}} 
 				<span style="font-size:1rem;">{{ weatherIcon(weatherPoint(filters.selectedDuocode).icon_descriptor) }}</span>
@@ -120,9 +122,8 @@
 				<strong>Rainfall min-max: </strong> <br/>
 				{{weatherPoint(filters.selectedDuocode).rain.amount.min || "∅"}}mm to {{weatherPoint(filters.selectedDuocode).rain.amount.max || "∅"}}mm
 				<br/>
-				<strong>UV Index max: </strong> <br/>
-				{{weatherPoint(filters.selectedDuocode).uv.max_index || "∅"}}
 			</div>
+			<div class="alert alert-info" role="alert" v-if="filters.modelType=='Preedict'">Weather information not currently available in predictive model mode</div>
 
 		</div></div></div>
 
@@ -184,6 +185,7 @@
 			return {
 				appData : {},
 				weatherData: {},
+				predictData: {},
 				duocodes: duocodes,
 				filters : {
 					date: '2020-05-22',
@@ -224,11 +226,10 @@
 						return jdata
 					});
 				}
-				return null
 			},
 
 			fetchWeatherData: async function () {
-				fetch("http://"+window.location.hostname+":8800/weather_data")
+				return fetch("http://"+window.location.hostname+":8800/weather_data")
 				.then( response => {
 					return response.json()
 				}).then( jdata => {
@@ -236,20 +237,33 @@
 					this.weatherData = jdata
 					return jdata
 				});
-				return null
 			},
 
 			//TODO: sync with UI
 			fetchPredictiveData : async function () {
-				fetch("http://"+window.location.hostname+":8800/predict")
+				return fetch("http://"+window.location.hostname+":8800/predict",{
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						'date': this.filters.date, 
+						'time': this.filters.time,
+						'predictTemperatureMin': this.filters.predictTemperatureMin,
+						'predictTemperatureMax': this.filters.predictTemperatureMax,
+						'predictRainfallMin': this.filters.predictRainfallMin,
+						'predictRainfallMax': this.filters.predictRainfallMax,
+						'predictWeatherType' : this.filters.predictWeatherType
+					})
+				})
 				.then( response => {
 					return response.json()
 				}).then( jdata => {
 					//console.log(jdata)
-					this.predict_data = jdata
+					this.predictData = jdata
 					return jdata
 				});
-				return null
 			},
 
 			// apply filters
@@ -274,7 +288,7 @@
 						var pcd = this.appData[this.filters.date]["postcode"]
 						for (var i in pcd) {
 							// find the actual timestamped collection
-							if ( (datetime.utc().format()) == pcd[i]["ts"]) {
+							if ( datetime.utc().format() == pcd[i]["ts"]) {
 								this.filteredData = pcd[i];
 								break;
 							}
@@ -282,6 +296,36 @@
 
 						this.filterWait = false
 					})
+				} else if (this.filterWait == false && this.filters.modelType=='predict') {
+					this.filterWait = true
+					this.fetchPredictiveData().then( () => {
+						if (this.predictData["postcode"].length == 0){
+							this.errors.dateSelect = true
+							this.filterWait = false
+							return;
+						}
+						this.errors.dateSelect = false
+						// new moment from date
+						var datetime = moment(this.filters.date).utcOffset('+1000')//.tz('Australia/NSW')
+						//console.log(datetime.format());
+						// add minutes to datetime
+						datetime = datetime.add(this.filters.time * 15, 'minutes');
+						// minutes to display
+						this.filters.timeText = datetime.format('h:mm a');
+
+						var pcd = this.predictData["postcode"]
+						for (var i in pcd) {
+							console.log(pcd[i]["ts"])
+							console.log(datetime.utc().format())
+							// find the actual timestamped collection
+							if ( (datetime.utc().format()) == pcd[i]["ts"]) {
+								this.filteredData = pcd[i];
+								break;
+							}
+						}
+
+						this.filterWait = false
+					} )
 				}
 			},
 

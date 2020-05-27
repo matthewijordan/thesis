@@ -71,13 +71,13 @@ def build_data():
 
     return np.array(dfx)#[:,0:10000]
 
-def modelFunction(X, z, a, b, c, d, e, f, g, h, i, j, k):#, d, e, f, g, h, i, j, k):
+def modelFunction(X, z, a, b, c, d, e, f, g, h, i, j, k, l):#, d, e, f, g, h, i, j, k):
     return (
             z
             + a*X[0]
-            + b/X[1]
-            + c*np.sin(d*X[2]) # fit sin to day of year
-            + e*np.power((k*X[3]+f),2)
+            + b*X[1]
+            + c*np.sin(d*X[2] + l) # fit sin to day of year
+            + e*np.sin(f*X[2] + k)
             + g*X[4]
             + h*X[5]
             + i*X[6]
@@ -85,11 +85,9 @@ def modelFunction(X, z, a, b, c, d, e, f, g, h, i, j, k):#, d, e, f, g, h, i, j,
         )
 
 def evaluateModel(x,y,day_of_year,minute_of_day,short_desc,temp_min,temp_max,rain_min,rain_max):
-    params = [ 
-        4.20696762e+01, -1.20180545e-01, -1.54200847e+02, -1.47419025e-01,
-        1.97953510e+00, -7.48322287e-02,  6.99992494e+00, -1.46788125e+00,
-        -2.05269971e-01, -8.69240534e-02, -2.15258429e-01
-    ]
+    params = [54.83830554, -0.11463331,  0.26378519,  0.27416531,  1.82869926, -0.43900216,
+    7.01288465, -1.4488113,  -0.23403748, -0.08625289, -0.19207864, -2.84723885,
+    43.48005778]
     inputX = [
         float(x or 0.),
         float(y or 0.),
@@ -102,7 +100,7 @@ def evaluateModel(x,y,day_of_year,minute_of_day,short_desc,temp_min,temp_max,rai
         float(rain_max or 0.)
     ]
     return modelFunction(inputX, params[0], 
-        params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11]
+        params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12]
     )
 
 
@@ -110,13 +108,13 @@ def evaluateModel(x,y,day_of_year,minute_of_day,short_desc,temp_min,temp_max,rai
 def train():
     df = build_data()
     # initial guesses for params
-    p0 = 54., 1., 1., 1., 2., 2., 7., 1., 1., 1., 1., 1.
+    p0 = 10., 10., 1., 1., 2., 2., 7., 1., 1., 1., 1., -2., -2
     cf = curve_fit(modelFunction, df[0:8,:], df[9,:], p0)
     print(cf[0])
-    testX = [135.6700048, -33.467076905, 146., 720., 1., 0., 15., 0., 0.]#,23.        ]
-    print(modelFunction(testX, cf[0][0], cf[0][1], cf[0][2], cf[0][3], cf[0][4], cf[0][5], cf[0][6], cf[0][7], cf[0][8], cf[0][9], cf[0][10],cf[0][11]))
+    testX = [135.6700048, -33.467076905, 146., 1., 1., 0., 15., 0., 0.]#,23.        ]
+    print(modelFunction(testX, cf[0][0], cf[0][1], cf[0][2], cf[0][3], cf[0][4], cf[0][5], cf[0][6], cf[0][7], cf[0][8], cf[0][9], cf[0][10],cf[0][11],cf[0][12]))
 
 
 if __name__=='__main__':
-    train()
-    #print(evaluateModel(135.6700048, -33.467076905, 146., 10., 0., 0., 15., 0., 0.))
+    #train()
+    print(evaluateModel(10.6700048, -33.467076905, 146., 10., 0., 0., 15., 0., 0.))

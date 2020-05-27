@@ -76,6 +76,8 @@
             // get data ready for rendering
             dataPoints: function() {
                 var dp = []
+                var count = 0
+                var cols = ["#FFD0C5","#FFEDC5","#F4FFC5","#D7FFC5","#C5FFED","#C5FFD0","#C5FFDE","#C5FFFB","#C5E6FF","#C5C9FF","#DEC5FF","#FBC5FF","#FEBABA","#FEDCBA","#FEFEBA","#DCFEBA","#BAFEBA","#BAFEDC","#D1BAFE","#F3BAFE","#FEBAE7","#FEBAC5","#FEBABF","#BAFED7","#BAFEC8","#FFD0C5","#FFEDC5","#F4FFC5","#D7FFC5","#C5FFED","#C5FFD0","#C5FFDE","#C5FFFB","#C5E6FF","#C5C9FF","#DEC5FF","#FBC5FF","#FEBABA","#FEDCBA","#FEFEBA","#DCFEBA","#BAFEBA","#BAFEDC","#D1BAFE","#F3BAFE","#FEBAE7","#FEBAC5","#FEBABF","#BAFED7","#BAFEC8"]
                 for (var k in duocodes) {
                     var dc = duocodes[k]
                     var thisdp = {}
@@ -84,6 +86,7 @@
                     thisdp.duocode = k
                     thisdp.value = 0
                     thisdp.shapedata = dc["shapedata"]
+                    thisdp.colour=cols[count++]
                     if (k in this.filteredData) {
                         thisdp.value = this.filteredData[k]
                     }

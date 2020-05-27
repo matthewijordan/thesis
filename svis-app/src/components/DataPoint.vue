@@ -45,7 +45,7 @@
         methods: {
 
             matterialProps: function(){
-                let mp={ diffuse : "#ccffcc", alpha : 1 , roughness : 0.9}
+                let mp={ diffuse : this.dataPoint.colour, alpha : 1 , roughness : 0.9}
                 if (this.isPicked) mp.diffuse="#F00"
                 if (!this.isPicked && this.pickMode){
                     mp.diffuse="#FFF"; mp.alpha=0.2

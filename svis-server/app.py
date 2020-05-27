@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, json
+from flask import Flask, jsonify, json, request
 import requests
 from flask_cors import CORS
 from datetime import datetime, timedelta
 import json
 from weather_au import api as wapi
 import numpy as np
+
+import predictive.poly as predictive
 
 app = Flask(__name__)
 # allow X-origin requests
@@ -55,6 +57,54 @@ def get_data(date = None, is_request=1):
 @app.route("/weather_data")
 def get_weather_data(date = None):
     return jsonify(weather_cache)
+
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    content = request.json
+
+    # date to days
+    date = content["date"]
+    dttm_utc = datetime.strptime(date,'%Y-%m-%d')
+    dttm = dttm_utc + timedelta(hours=10)
+    new_year_day = datetime(year=dttm.year, month=1, day=1)
+    day_of_year = (dttm - new_year_day).days + 1
+
+    time = float(content["time"])
+
+    tempMin = float(content["predictTemperatureMin"])
+    tempMax = float(content["predictTemperatureMax"])
+    rainMin = float(content["predictRainfallMin"])
+    rainMax = float(content["predictRainfallMax"])
+    short_desc = predictive.weather_desc_mapping[content["predictWeatherType"]]
+
+    pcdata = []
+
+    with open('../svis-app/src/data/duocodes.json') as f:
+        duo_data = json.load(f)
+
+    # every 15 min interval
+    for pcdataindex in range(0,96):
+        timegroup = {}
+        ts = dttm_utc + timedelta(minutes=15 * pcdataindex) - timedelta(hours=10)
+        timegroup['ts'] = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
+        for dc_k, dc_v in duo_data.items():
+            timegroup[dc_k] = predictive.evaluateModel(
+                dc_v['long'],
+                dc_v['lat'],
+                day_of_year,
+                time,
+                short_desc,
+                tempMin,
+                tempMax,
+                rainMin,
+                rainMax
+            )
+        pcdata.append(timegroup)
+
+    return jsonify({
+        "postcode": pcdata
+    })
 
 def pre_load_solar_data():
     print("[SVIS-SERVER] Trying to load data cache")
