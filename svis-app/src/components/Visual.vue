@@ -63,7 +63,7 @@
                 camera: null,
                 pointerTrack: null,
                 camTarget: { x:132, y:0, z:-16 },
-                origin: {x:132, y:0, z:-24}
+                origin: {x:136, y:0, z:-24}
             }
         },
 
