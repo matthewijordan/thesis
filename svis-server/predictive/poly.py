@@ -51,7 +51,10 @@ def build_data():
                         continue # not todays weather
                     # numericise short desc
                     
-                    short_desc  = weather_desc_mapping[wd['icon_descriptor']]
+                    if wd['icon_descriptor'] is None:
+                        short_desc = 0.0
+                    else:
+                        short_desc  = weather_desc_mapping[wd['icon_descriptor']]
                     temp_min    = float(wd['temp_min'] or 0.)
                     temp_max    = float(wd['temp_max'] or 0.)
                     rain_min    = float(wd['rain']['amount']['min'] or 0.)
@@ -77,7 +80,7 @@ def modelFunction(X, z, a, b, c, d, e, f, g, h, i, j, k, l):#, d, e, f, g, h, i,
             + a*X[0]
             + b*X[1]
             + c*np.sin(d*X[2] + l) # fit sin to day of year
-            + e*np.sin(f*X[2] + k)
+            + e*np.sin(f*X[3] + k)
             + g*X[4]
             + h*X[5]
             + i*X[6]
@@ -85,9 +88,9 @@ def modelFunction(X, z, a, b, c, d, e, f, g, h, i, j, k, l):#, d, e, f, g, h, i,
         )
 
 def evaluateModel(x,y,day_of_year,minute_of_day,short_desc,temp_min,temp_max,rain_min,rain_max):
-    params = [54.83830554, -0.11463331,  0.26378519,  0.27416531,  1.82869926, -0.43900216,
-    7.01288465, -1.4488113,  -0.23403748, -0.08625289, -0.19207864, -2.84723885,
-    43.48005778]
+    params = [54.84463896, -0.11463858,  0.26385153,  0.24786801,  1.92331899,  0.07543331,
+    7.0000139,  -1.43637761, -0.19861855, -0.0968635,  -0.20571374, -3.24015538,
+    11.54454866]
     inputX = [
         float(x or 0.),
         float(y or 0.),
@@ -116,5 +119,5 @@ def train():
 
 
 if __name__=='__main__':
-    #train()
-    print(evaluateModel(10.6700048, -33.467076905, 146., 10., 0., 0., 15., 0., 0.))
+    train()
+    #print(evaluateModel(10.6700048, -33.467076905, 146., 10., 0., 0., 15., 0., 0.))

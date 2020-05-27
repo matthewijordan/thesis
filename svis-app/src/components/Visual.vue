@@ -77,7 +77,7 @@
             dataPoints: function() {
                 var dp = []
                 var count = 0
-                var cols = ["#FFD0C5","#FFEDC5","#F4FFC5","#D7FFC5","#C5FFED","#C5FFD0","#C5FFDE","#C5FFFB","#C5E6FF","#C5C9FF","#DEC5FF","#FBC5FF","#FEBABA","#FEDCBA","#FEFEBA","#DCFEBA","#BAFEBA","#BAFEDC","#D1BAFE","#F3BAFE","#FEBAE7","#FEBAC5","#FEBABF","#BAFED7","#BAFEC8","#FFD0C5","#FFEDC5","#F4FFC5","#D7FFC5","#C5FFED","#C5FFD0","#C5FFDE","#C5FFFB","#C5E6FF","#C5C9FF","#DEC5FF","#FBC5FF","#FEBABA","#FEDCBA","#FEFEBA","#DCFEBA","#BAFEBA","#BAFEDC","#D1BAFE","#F3BAFE","#FEBAE7","#FEBAC5","#FEBABF","#BAFED7","#BAFEC8"]
+                var cols = ["#FFD0C5","#FEBAC5","#FEBAE7","#F3BAFE","#C5C9FF","#BAFEC8","#FEFEBA","#D1BAFE","#BAFEBA","#FEBABA","#FEBABF","#BAFEDC","#D1BAFE","#FEDCBA","#F3BAFE","#C5FFED","#F4FFC5","#C5E6FF","#C5FFD0","#BAFEDC","#C5FFFB","#FFD0C5","#BAFEC8","#FFEDC5","#F4FFC5","#FBC5FF","#FEBAE7","#BAFED7","#C5E6FF","#C5C9FF","#C5FFD0","#FEBABF","#FEBAC5","#C5FFFB","#D7FFC5","#DEC5FF","#FEBABA","#FEFEBA","#D7FFC5","#FEDCBA","#DEC5FF","#DCFEBA","#FFEDC5","#C5FFDE","#BAFEBA","#FBC5FF","#DCFEBA","#C5FFDE","#BAFED7","#C5FFED"]
                 for (var k in duocodes) {
                     var dc = duocodes[k]
                     var thisdp = {}
