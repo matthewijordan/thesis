@@ -14,7 +14,7 @@
     "core-js": "^3.6.4",
     "dat.gui": "^0.7.6",
     "earcut": "^2.2.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
     "oimo": "^1.0.9",
